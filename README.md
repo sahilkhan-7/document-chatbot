@@ -86,7 +86,7 @@ This project integrates **LangChain** and **Groq LLM** to enable users to:
 
 ### **1. Clone the Repository**  
 ```bash
-git clone https://github.com/sahilkhan-7/documents-chatbot.git
+git clone https://github.com/sahilkhan-7/document-chatbot.git
 cd chat-with-documents
 ```
 
