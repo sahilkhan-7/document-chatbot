@@ -198,8 +198,8 @@ def main():
     """
     Main function to set up the Streamlit interface and handle user interactions.
     """
-    st.set_page_config(page_title="Chat with Multiple Documents", layout="wide", page_icon="💬")
-    st.header("Chat with Documents using Groq SDK 🚀")
+    st.set_page_config(page_title="Chat with Multiple Documents", layout="wide", page_icon=":books:")
+    st.header("Chat with Documents using LangChain and Groq")
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
@@ -208,15 +208,26 @@ def main():
 
     with st.sidebar:
         st.subheader("Upload your Documents")
-        uploaded_files = st.file_uploader("Upload your files", type=['pdf', 'docx', 'txt'], accept_multiple_files=True)
+        uploaded_files = st.file_uploader("Upload your files here", type=['pdf', 'docx', 'txt'], accept_multiple_files=True)
 
+        # Process Files Button
         if st.button("Process Documents"):
-            if uploaded_files:
-                documents = load_documents(uploaded_files)
-                chunks = split_documents(documents)
-                vector_store = create_vector_store(chunks)
-                st.session_state.conversation = create_conversational_retrieval_chain(vector_store)
-                st.success("Documents processed successfully! ✅")
+            if not uploaded_files:
+                st.error("Please upload at least one document.")
+            else:
+                with st.spinner("Processing documents..."):
+                    try:
+                        documents = load_documents(uploaded_files)
+                        chunks = split_documents(documents)
+                        st.write(f"✅ Created {len(chunks)} text chunks")
+
+                        vector_store = create_vector_store(chunks)
+                        st.write("✅ Created vector store")
+
+                        st.session_state.conversation = create_conversational_retrieval_chain(vector_store)
+                        st.success("Documents processed successfully! ✅")
+                    except Exception as e:
+                        st.error(f"An error occurred: {e}")
 
     if st.button("Clear Chat"):
         st.session_state.chat_history = []
@@ -226,7 +237,10 @@ def main():
 
     user_question = st.text_input("Ask a question about your documents:")
     if user_question:
-        handle_user_input(user_question)
+        if st.session_state.conversation is None:
+            st.warning("Please process the documents first.")
+        else:
+            handle_user_input(user_question)
 
     for message in st.session_state.chat_history:
         if isinstance(message, HumanMessage):
