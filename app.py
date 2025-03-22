@@ -13,7 +13,7 @@ from groq import Groq
 from typing import Optional, List, Mapping, Any
 from dotenv import load_dotenv
 
-# Load environment variables (Groq API Key)
+# Loading the Groq API Key from environment variables
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
@@ -24,7 +24,7 @@ class GroqLLM(LLM):
     Uses the Groq API to generate responses based on user input and chat history.
     """
     
-    # Define class attributes properly
+    # Defining the Groq LLM parameters
     temperature: float = 0.3
     max_tokens: int = 500
     
@@ -47,7 +47,7 @@ class GroqLLM(LLM):
         """
         client = Groq(api_key=GROQ_API_KEY)
         
-        # Define system prompt for better responses
+        # Defining the system prompt for better responses
         messages = [
             {"role": "system", "content": 
              """You are a knowledgeable assistant that answers questions based solely on the provided context.
@@ -90,7 +90,7 @@ def load_documents(uploaded_files):
     temp_dir = "temp_files"
     os.makedirs(temp_dir, exist_ok=True)
     
-    # Track progress
+    # progress
     progress_bar = st.progress(0)
     total_files = len(uploaded_files)
     
@@ -111,7 +111,7 @@ def load_documents(uploaded_files):
         documents.extend(loader.load())
         os.remove(temp_filepath)  # Cleanup
         
-        # Update progress
+        # Updating progress
         progress_bar.progress((i + 1) / total_files)
     
     return documents
@@ -178,7 +178,7 @@ def handle_user_input(user_question):
     with st.spinner("Thinking..."):
         response = st.session_state.conversation({'question': user_question})
     
-    # Extract only the answer
+    # Extracting only the answer
     response_text = response.get("answer", "No response generated.")
     
     # Update the chat history for display purposes
@@ -230,7 +230,7 @@ def main():
                         st.write(f"✅ Created {len(chunks)} text chunks")
                         
                         vector_store = create_vector_store(chunks)
-                        st.session_state.vector_store = vector_store  # Store vector_store in session state
+                        st.session_state.vector_store = vector_store
                         st.write("✅ Created vector store")
                         
                         st.session_state.conversation = create_conversational_retrieval_chain(vector_store)
@@ -269,6 +269,7 @@ def main():
     # Chat container with messages
     chat_container = st.container()
     with chat_container:
+
         # Display chat history
         for message in st.session_state.chat_history:
             if isinstance(message, HumanMessage):
@@ -286,20 +287,18 @@ def main():
     def process_input():
         if st.session_state.user_input and st.session_state.conversation:
             handle_user_input(st.session_state.user_input)
-            # Clear the input after processing
             st.session_state.user_input = ""
     
-    # Create a container to hold the text input
+    # Container to hold the text input
     input_container = st.container()
     
     # Add the text input for questions
     with input_container:
-        # Use a key press detector to handle Enter key
         user_question = st.text_input(
             "Ask a question about your documents:",
             key="user_input",
             placeholder="Type your question and press Enter...",
-            on_change=process_input  # Process on change (Enter key press)
+            on_change=process_input
         )
 
 
